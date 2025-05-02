@@ -1,6 +1,8 @@
 module tau_neural_net_quantile
 
     use shr_kind_mod,   only: r8=>shr_kind_r8
+    ! AGS
+    use ftorch,         only: torch_model
 
     use module_neural_net, only : Dense, init_neural_net, load_quantile_scale_values
     use module_neural_net, only : quantile_transform, quantile_inv_transform, neural_net_predict
@@ -14,7 +16,10 @@ module tau_neural_net_quantile
 
     ! Neural networks and scale values saved within the scope of the module.
     ! Need to call initialize_tau_emulators to load weights and tables from disk.
-    type(Dense), allocatable, save :: q_all(:)
+    ! AGS
+    !type(torch_model), allocatable, save :: q_all(:)
+    !type(Dense), allocatable, save :: q_all(:)
+    type(torch_model) :: q_all
     real(r8), dimension(:, :), allocatable, save :: input_scale_values
     real(r8), dimension(:, :), allocatable, save :: output_scale_values
 contains
