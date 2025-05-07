@@ -4,8 +4,10 @@ module module_neural_net
     !use shr_kind_mod,   only: r4=>shr_kind_r4
     use ppgrid,          only:  pver
     ! AGS
-    use ftorch,         only: torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
-    use ftorch,         only: torch_model_load, torch_model_forward, torch_tensor_delete
+    use FTorch_cesm_interface, only : torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
+    use FTorch_cesm_interface, only : torch_model_load, torch_model_forward
+!    use ftorch,         only: torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
+!    use ftorch,         only: torch_model_load, torch_model_forward, torch_tensor_delete
     implicit none
     type Dense
         integer :: input_size
@@ -137,7 +139,7 @@ contains
         ! Output:
         ! model_ftorch: FTorch model handle
         !
-        use ftorch, only: torch_model_load, torch_kCPU
+!        use ftorch, only: torch_model_load, torch_kCPU
     
         character(len=*), intent(in) :: filename
         integer, intent(in) :: batch_size
@@ -362,8 +364,8 @@ contains
         ! prediction (output): The prediction of the neural network as a 2D array
         ! iulog (input): Log file unit number
 
-        use ftorch, only: torch_tensor, torch_tensor_from_array, torch_model_forward
-        use ftorch, only: torch_kCPU
+!        use ftorch, only: torch_tensor, torch_tensor_from_array, torch_model_forward
+!        use ftorch, only: torch_kCPU
     
         real(kind=r8), intent(in) :: input(:, :)
         type(torch_model), intent(in) :: model_ftorch

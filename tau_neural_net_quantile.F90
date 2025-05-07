@@ -2,8 +2,8 @@ module tau_neural_net_quantile
 
     use shr_kind_mod,   only: r8=>shr_kind_r8
     ! AGS
-    use ftorch,         only: torch_model
-
+!    use ftorch,         only: torch_model
+    use ftorch_cesm_interface, only : torch_model
     use module_neural_net, only : Dense, init_neural_net, load_quantile_scale_values
     use module_neural_net, only : quantile_transform, quantile_inv_transform, neural_net_predict
     use tester, only : write_test_values
@@ -33,7 +33,7 @@ contains
     character(len=*), intent(in) ::  stochastic_emulated_filename_quantile, stochastic_emulated_filename_input_scale, &
                                      stochastic_emulated_filename_output_scale
     integer,          intent(in)  :: iulog
-    character(128),   intent(out) :: errstring  ! output status (non-blank for error return)
+    character(128),   intent(out) :: errstring  ! output status(non-blank for error return)
 
         errstring = ''
 
