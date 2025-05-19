@@ -11,8 +11,8 @@ module tau_neural_net_quantile
     implicit none
     integer, parameter, public :: i8 = selected_int_kind(18)
     integer, parameter :: num_inputs = 9
-    integer, parameter :: num_outputs = 3
-    integer, parameter :: batch_size = 1
+    integer, parameter :: num_outputs = 3 
+    integer, parameter :: batch_size = 1 
 
     ! Neural networks and scale values saved within the scope of the module.
     ! Need to call initialize_tau_emulators to load weights and tables from disk.

@@ -1,7 +1,7 @@
 module module_neural_net
     use netcdf
     use shr_kind_mod,   only: r8=>shr_kind_r8
-    !use shr_kind_mod,   only: r4=>shr_kind_r4
+    use shr_kind_mod,   only: r4=>shr_kind_r4
     use ppgrid,          only:  pver
     ! AGS
     use FTorch_cesm_interface, only : torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
@@ -152,8 +152,10 @@ contains
           call torch_model_load(model_ftorch, trim(filename), torch_kCPU)
         ! call torch_model_load(model_ftorch, trim(filename))   
         ! Log successful model loading
-        write(iulog,*) 'Successfully loaded neural network model from: ', trim(filename)
-        write(iulog,*) 'Model batch size set to: ', batch_size
+          !write(iulog,*) 'Successfully loaded neural network model from: ', trim(filename)
+          !write(iulog,*) 'Model batch size set to: ', batch_size
+         
+        
         
     end subroutine init_neural_net
 
@@ -377,57 +379,83 @@ contains
         integer :: current_batch_size
     
         ! FTorch tensors
-        type(torch_tensor), dimension(1) :: in_tensor, out_tensor
-    
+          type(torch_tensor), dimension(1) :: in_tensor, out_tensor
+        ! AGS
+        ! type(torch_tensor) :: in_tensor, out_tensor
+
         ! Tensor shapes and layouts
         integer :: in_layout(2), out_layout(2)
     
         ! Data arrays for tensor conversion
-        real(r8), allocatable, target :: in_data_single(:,:)
-        real(r8), allocatable, target :: out_data_single(:,:)
+        
+        real(r4), allocatable, target :: in_data_single(:,:)
+        real(r4), allocatable, target :: out_data_single(:,:)
 
         ! Get dimensions
         num_samples = size(input, 1)
         num_features = size(input, 2)
         num_outputs = size(prediction, 2)
-        batch_size = min(64, num_samples)  ! Default batch size or use parameter
+        batch_size = 1 ! AGS !min(64, num_samples)  ! Default batch size or use parameter
     
         ! Set up tensor layouts
         in_layout = [1, 2]  ! [row, col] layout
         out_layout = [1, 2]
 
+        !AGS
+        !write(*,*) 'Number of samples ', num_samples
+        ! AGS, Allocate once
+          allocate(in_data_single(batch_size, num_features))
+          allocate(out_data_single(batch_size, num_outputs))
         ! Process batches
         do i = 1, num_samples, batch_size
             ! Calculate current batch size (might be smaller for final batch)
             current_batch_size = min(batch_size, num_samples - i + 1)
         
             ! Allocate temporary arrays for current batch
-            allocate(in_data_single(current_batch_size, num_features))
-            allocate(out_data_single(current_batch_size, num_outputs))
-        
+            ! allocate(in_data_single(current_batch_size, num_features))
+            ! allocate(out_data_single(current_batch_size, num_outputs))
+            
+            ! AGS
             ! Convert input batch to single precision
-            in_data_single = real(input(i:i+current_batch_size-1, :), r8)
+            ! in_data_single = real(input(i:i+current_batch_size-1, :), r4)
+            ! AGS added the following three lines
+            in_data_single(1, :) = real(input(i, :), r4)
+            call torch_tensor_from_array(in_tensor(1), in_data_single(1:1, :), in_layout, torch_kCPU)
+            call torch_tensor_from_array(out_tensor(1), out_data_single(1:1, :), out_layout, torch_kCPU)
+
+            ! AGS, Convert to single precision
+            ! in_data_single(1:current_batch_size, :) = real(input(i:i+current_batch_size-1, :), r4)
         
             ! Create tensors from arrays
-            call torch_tensor_from_array(in_tensor(1), in_data_single, in_layout, torch_kCPU)
-            call torch_tensor_from_array(out_tensor(1), out_data_single, out_layout, torch_kCPU)
+            ! AGS commented out the following two lines
+            ! call torch_tensor_from_array(in_tensor(1), in_data_single, in_layout, torch_kCPU)
+            ! call torch_tensor_from_array(out_tensor(1), out_data_single, out_layout, torch_kCPU)
         
             ! Forward pass through the model
             call torch_model_forward(model_ftorch, in_tensor, out_tensor)
         
-            ! Convert output to double precision and store in prediction array
-            prediction(i:i+current_batch_size-1, :) = real(out_data_single, r8)
-        
+            ! Convert output to double precision and store in prediction array, AGS comment this out
+            ! prediction(i:i+current_batch_size-1, :) = real(out_data_single, r8)
+            ! AGS
+              prediction(i, :) = real(out_data_single(1,:), r8)
+            ! AGS, Convert output back to double precision
+            ! prediction(i:i+current_batch_size-1, :) = real(out_data_single(1:current_batch_size, :), r8)
+
+            ! AGS
+            ! write(iulog,*) "Processed batch starting at sample ", i
             ! Clean up temporary arrays
-            deallocate(in_data_single)
-            deallocate(out_data_single)
+            ! deallocate(in_data_single)
+            ! deallocate(out_data_single)
         end do
+         ! Clean up
+         deallocate(in_data_single)
+         deallocate(out_data_single)
 
         ! Apply sigmoid function if needed for probability output
         ! (Uncomment if the model output needs sigmoid activation)
         ! prediction(:,:) = 1.0_r8 / (1.0_r8 + exp(-prediction(:,:)))
     
-        write(iulog,*) 'Neural network prediction completed for', num_samples, 'samples'
+        ! write(iulog,*) 'Neural network prediction completed for', num_samples, 'samples'
     
     end subroutine neural_net_predict
     
