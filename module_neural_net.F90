@@ -1,13 +1,10 @@
 module module_neural_net
     use netcdf
-    use shr_kind_mod,   only: r8=>shr_kind_r8
-    use shr_kind_mod,   only: r4=>shr_kind_r4
+    use pumas_kinds, only: r8=>kind_r8, r4=>kind_r4
     use ppgrid,          only:  pver
     ! AGS
     use FTorch_cesm_interface, only : torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
     use FTorch_cesm_interface, only : torch_model_load, torch_model_forward
-!    use ftorch,         only: torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
-!    use ftorch,         only: torch_model_load, torch_model_forward, torch_tensor_delete
     implicit none
     type Dense
         integer :: input_size
@@ -202,7 +199,7 @@ contains
         character(len=9) :: ref_var_name = "reference"
         character(len=9) :: quant_var_name = "quantiles"
         integer :: ncid, quantile_id, column_id, quantile_dim, column_dim, ref_var_id, quant_var_id
-        
+
         errstring = ''
 
         call check(nf90_open(filename, nf90_nowrite, ncid),errstring)
@@ -524,7 +521,7 @@ contains
         real(r8), intent(out) :: transformed_data(size(input_data, 1), size(input_data, 2))
         character(128),   intent(out) :: errstring  ! output status (non-blank for error return)
         integer :: i
- 
+
         errstring = ''
         if (size(input_data, 2) /= size(scale_values, 1)) then
             write(errstring,*) "Size mismatch between input data and scale values", size(input_data, 2), size(scale_values, 1)
