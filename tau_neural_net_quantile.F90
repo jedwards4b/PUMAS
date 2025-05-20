@@ -1,6 +1,6 @@
 module tau_neural_net_quantile
 
-  use pumas_kinds,       only : r8=>kind_r8
+  use pumas_kinds,       only : r8=>kind_r8, i8=>kind_i8, r4=>kind_r4
 ! AGS
 
     use ftorch_cesm_interface, only : torch_model
@@ -10,7 +10,6 @@ module tau_neural_net_quantile
     use tester, only : write_test_values
 
     implicit none
-    integer, parameter, public :: i8 = selected_int_kind(18)
     integer, parameter :: num_inputs = 9
     integer, parameter :: num_outputs = 3 
     integer, parameter :: batch_size = 1 

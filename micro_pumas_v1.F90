@@ -296,6 +296,7 @@ logical           :: do_implicit_fall !   = .true.
 
 logical           :: accre_sees_auto  != .true.
 
+integer local_iulog ! added by jpe
 !$acc declare create (nccons,nicons,ngcons,nrcons,nscons,ncnst,ninst,ngnst,    &
 !$acc                 nrnst,nsnst,evap_sed_off,icenuc_rh_off,evap_scl_ifs,     &
 !$acc                 icenuc_use_meyers,evap_rhthrsh_ifs,rainfreeze_ifs,       &
@@ -563,7 +564,7 @@ subroutine micro_pumas_init( &
       call initialize_tau_emulators(stochastic_emulated_filename_quantile, stochastic_emulated_filename_input_scale, &
                                     stochastic_emulated_filename_output_scale, iulog, errstring)
   end if
-
+  local_iulog = iulog
 end subroutine micro_pumas_init
 
 !===============================================================================
@@ -2103,7 +2104,7 @@ subroutine micro_pumas_tend ( &
                                                   proc_rates%qctend_TAU(1:mgncol,k), &
                                                   proc_rates%qrtend_TAU(1:mgncol,k), &
                                                   proc_rates%nctend_TAU(1:mgncol,k), &
-                                                  proc_rates%nrtend_TAU(1:mgncol,k), iulog)
+                                                  proc_rates%nrtend_TAU(1:mgncol,k), local_iulog)
 
         call ML_fixer_calc(mgncol, deltatin, qcic(1:mgncol,k), ncic(1:mgncol,k), &
                            qric(1:mgncol,k), nric(1:mgncol,k), &

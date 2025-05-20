@@ -4,7 +4,7 @@ module module_neural_net
     use ppgrid,          only:  pver
     ! AGS
     use FTorch_cesm_interface, only : torch_kCPU, torch_tensor, torch_model, torch_tensor_from_array
-    use FTorch_cesm_interface, only : torch_model_load, torch_model_forward
+    use FTorch_cesm_interface, only : torch_model_load, torch_model_forward, torch_delete
     implicit none
     type Dense
         integer :: input_size
@@ -447,7 +447,8 @@ contains
          ! Clean up
          deallocate(in_data_single)
          deallocate(out_data_single)
-
+         call torch_delete(in_tensor)
+         call torch_delete(out_tensor)
         ! Apply sigmoid function if needed for probability output
         ! (Uncomment if the model output needs sigmoid activation)
         ! prediction(:,:) = 1.0_r8 / (1.0_r8 + exp(-prediction(:,:)))
